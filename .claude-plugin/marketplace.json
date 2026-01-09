@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "city-weather",
-      "source": "./city-weather",
+      "source": "city-weather",
       "description": "Get current weather, time, and precipitation forecast for any city",
       "version": "1.0.0",
       "author": {
