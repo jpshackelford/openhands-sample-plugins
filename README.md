@@ -15,7 +15,7 @@ openhands-sample-plugins/
 │       ├── .claude-plugin/
 │       │   └── plugin.json   # Plugin manifest
 │       └── commands/
-│           └── weather.md    # Slash command
+│           └── now.md    # Slash command
 └── README.md
 ```
 
@@ -32,14 +32,14 @@ Get current weather, time, and precipitation forecast for any city worldwide.
 
 **Usage:**
 ```
-/city-weather:weather <city>
+/city-weather:now <city>
 ```
 
 **Examples:**
 ```
-/city-weather:weather New York
-/city-weather:weather Tokyo
-/city-weather:weather London
+/city-weather:now New York
+/city-weather:now Tokyo
+/city-weather:now London
 ```
 
 ## Installation

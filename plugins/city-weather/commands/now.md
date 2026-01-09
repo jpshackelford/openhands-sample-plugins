@@ -44,9 +44,9 @@ Get the current time, temperature (in both Fahrenheit and Celsius), and precipit
 
 ## Example Usage
 
-`/city-weather:weather New York`
-`/city-weather:weather Tokyo`
-`/city-weather:weather London`
+`/city-weather:now New York`
+`/city-weather:now Tokyo`
+`/city-weather:now London`
 
 ## Notes
 
