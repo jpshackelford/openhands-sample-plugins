@@ -6,13 +6,10 @@
     "name": "JP Shackelford",
     "email": "jpshackelford@users.noreply.github.com"
   },
-  "metadata": {
-    "pluginRoot": "./plugins"
-  },
   "plugins": [
     {
       "name": "city-weather",
-      "source": "city-weather",
+      "source": "./plugins/city-weather",
       "description": "Get current weather, time, and precipitation forecast for any city",
       "version": "1.0.0",
       "author": {
