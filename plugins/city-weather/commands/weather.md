@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(curl:*), fetch
+allowed-tools: Bash(curl:*)
 argument-hint: <city>
 description: Get current weather, time, and precipitation forecast for a city
 ---
