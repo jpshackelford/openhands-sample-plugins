@@ -11,9 +11,9 @@ There is experimental, unmerged capability for launching plugins directly from O
 | Repository | Issue/PR | Description |
 |------------|----------|-------------|
 | OpenHands/OpenHands | [#12316](https://github.com/OpenHands/OpenHands/issues/12316) | Support for bare git repository plugin marketplaces |
-| OpenHands/OpenHands | [#12321](https://github.com/OpenHands/OpenHands/issues/12321) | App Server: Accept plugin spec in conversation start API |
 | OpenHands/software-agent-sdk | [#1645](https://github.com/OpenHands/software-agent-sdk/issues/1645) | Add `Plugin.fetch()` for remote plugin fetching and caching |
 | OpenHands/software-agent-sdk | [#1650](https://github.com/OpenHands/software-agent-sdk/issues/1650) | Agent Server: Load plugins when starting conversations |
+| OpenHands/OpenHands | [#12321](https://github.com/OpenHands/OpenHands/issues/12321) | App Server: Accept plugin spec in conversation start API |
 
 ---
 
@@ -76,7 +76,6 @@ ${STAGING_URL}/conversations/${CONVERSATION_ID}
 | Plugin | Source | Description |
 |--------|--------|-------------|
 | Anthropic Skills | `github:anthropics/skills` | Brand guidelines, frontend design, document tools |
-| OpenHands Skills | `github:OpenHands/skills` | Code review, Docker, GitHub, Kubernetes skills |
 
 ---
 
