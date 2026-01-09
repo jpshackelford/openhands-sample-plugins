@@ -60,7 +60,7 @@ Then install the city-weather plugin:
 
 ### OpenHands
 
-This marketplace is compatible with OpenHands plugin support. See the [OpenHands documentation](https://docs.openhands.dev/) for installation instructions.
+This marketplace is compatible with OpenHands plugin support. See the [OpenHands SDK Skills Guide](https://docs.openhands.dev/sdk/guides/skill) for details on plugin and skill support.
 
 ## API
 
