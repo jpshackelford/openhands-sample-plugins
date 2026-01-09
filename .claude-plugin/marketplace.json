@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "openhands-sample-plugins",
+  "description": "Sample plugins for OpenHands demonstrating plugin marketplace capabilities",
+  "owner": {
+    "name": "JP Shackelford",
+    "email": "jpshackelford@users.noreply.github.com"
+  },
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "city-weather",
+      "source": "./city-weather",
+      "description": "Get current weather, time, and precipitation forecast for any city",
+      "version": "1.0.0",
+      "author": {
+        "name": "JP Shackelford"
+      },
+      "category": "utilities",
+      "tags": ["weather", "time", "forecast", "utilities"]
+    }
+  ]
+}
