@@ -2,22 +2,118 @@
 
 This guide covers common issues and troubleshooting tips when testing the OpenHands plugin REST API.
 
-## API Endpoint Reference
+## Architecture Overview
 
-### App Server Endpoints
+OpenHands uses a **two-server architecture**:
+
+| Server | Location | Purpose |
+|--------|----------|---------|
+| **App Server** | Cloud/Staging URL | Manages conversations, users, orchestration |
+| **Agent Server** | Inside sandbox | Runs the agent, handles plugin loading, executes tools |
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Frontend /    │────▶│   App Server    │────▶│  Agent Server   │
+│   API Client    │     │  (Cloud URL)    │     │  (In Sandbox)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                              │                        │
+                              │ Creates sandbox,       │ Fetches plugin,
+                              │ passes plugin spec     │ loads skills,
+                              │                        │ runs conversation
+```
+
+---
+
+## App Server API
+
+The App Server is your main entry point. It's at the staging/cloud URL you're given.
+
+### Base URL
+```bash
+export STAGING_URL="https://ohpr-XXXXX-XX.staging.all-hands.dev"
+```
+
+### Authentication
+```bash
+-H "Authorization: Bearer ${API_KEY}"
+```
+
+### Key Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/v1/app-conversations` | Create a new conversation (with optional plugin) |
 | GET | `/api/v1/app-conversations?ids={id}` | Get conversation status (note: `ids` param required) |
+| GET | `/api/v1/app-conversations?ids={id1},{id2}` | Get multiple conversations |
 
-### Authentication
+### Swagger Documentation
+```
+${STAGING_URL}/docs
+```
+> **Note:** Requires OAuth login on staging deployments.
 
-All API requests require Bearer token authentication:
+---
+
+## Agent Server API
+
+The Agent Server runs **inside the sandbox** and has its own REST API. You get its URL from the conversation response.
+
+### Getting the Agent Server URL
+
+After creating a conversation, poll until `agent_server_url` is populated:
 
 ```bash
--H "Authorization: Bearer ${API_KEY}"
+# Create conversation
+RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
+  -H "Authorization: Bearer ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"initial_message": {"content": [{"type": "text", "text": "Hello"}]}}')
+
+CONVERSATION_ID=$(echo "$RESPONSE" | jq -r '.id')
+
+# Poll until agent_server_url is available
+curl -s "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" \
+  -H "Authorization: Bearer ${API_KEY}" | jq '.[0] | {sandbox_status, agent_server_url}'
 ```
+
+**Example Response (when ready):**
+```json
+{
+  "sandbox_status": "running",
+  "agent_server_url": "https://runtime-xxxxx.staging.all-hands.dev"
+}
+```
+
+### Agent Server Swagger Documentation
+Once you have the agent server URL:
+```
+${AGENT_SERVER_URL}/docs
+```
+
+### Key Agent Server Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/conversations` | List conversations on this agent server |
+| GET | `/api/v1/conversations/{id}` | Get conversation details |
+| GET | `/api/v1/conversations/{id}/events` | Get conversation events |
+| POST | `/api/v1/conversations/{id}/messages` | Send a message |
+
+### Example: List Conversations on Agent Server
+
+```bash
+AGENT_SERVER_URL="https://runtime-xxxxx.staging.all-hands.dev"
+
+curl -s "${AGENT_SERVER_URL}/api/v1/conversations" | jq '.'
+```
+
+### Example: Get Conversation Events
+
+```bash
+curl -s "${AGENT_SERVER_URL}/api/v1/conversations/${CONVERSATION_ID}/events" | jq '.'
+```
+
+This is useful for debugging plugin loading - look for events related to skill loading.
 
 ---
 
