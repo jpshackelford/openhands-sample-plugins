@@ -70,6 +70,7 @@ echo "  City: $CITY"
 echo ""
 
 # Create conversation with plugin
+# Note: The city-weather plugin is in a subdirectory, so we must specify the path
 echo -e "${YELLOW}Creating conversation with city-weather plugin...${NC}"
 
 RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
@@ -86,7 +87,8 @@ RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
     },
     "plugin": {
       "source": "github:jpshackelford/openhands-sample-plugins",
-      "ref": "main"
+      "ref": "main",
+      "path": "plugins/city-weather"
     }
   }')
 
@@ -103,21 +105,24 @@ echo -e "${GREEN}Conversation created: ${CONVERSATION_ID}${NC}"
 echo ""
 
 # Wait for sandbox to be ready
+# Note: Sandbox startup can take 30-90+ seconds depending on load
 echo -e "${YELLOW}Waiting for sandbox to start...${NC}"
-echo "(This typically takes 20-40 seconds)"
+echo "(This typically takes 30-90 seconds)"
 echo ""
 
-MAX_ATTEMPTS=30
+MAX_ATTEMPTS=45
 ATTEMPT=0
 
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     ATTEMPT=$((ATTEMPT + 1))
     
-    STATUS_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/${CONVERSATION_ID}" \
+    # Note: The GET endpoint requires ?ids= query parameter
+    STATUS_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" \
       -H "Authorization: Bearer ${API_KEY}")
     
-    SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.sandbox_status // "unknown"')
-    TITLE=$(echo "$STATUS_RESPONSE" | jq -r '.title // "Untitled"')
+    # Response is an array, extract first element
+    SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.[0].sandbox_status // "pending"')
+    TITLE=$(echo "$STATUS_RESPONSE" | jq -r '.[0].title // "Untitled"')
     
     printf "\r  Attempt %d/%d: sandbox_status=%s          " "$ATTEMPT" "$MAX_ATTEMPTS" "$SANDBOX_STATUS"
     
@@ -134,7 +139,7 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
         exit 1
     fi
     
-    sleep 2
+    sleep 3
 done
 
 if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
