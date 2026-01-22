@@ -73,6 +73,8 @@ echo ""
 # Note: The city-weather plugin is in a subdirectory, so we must specify repo_path
 echo -e "${YELLOW}Creating conversation with city-weather plugin...${NC}"
 
+# Use slash command to directly invoke the plugin skill
+# This guarantees the plugin's skill is used rather than letting the agent choose
 RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Content-Type: application/json" \
@@ -81,7 +83,7 @@ RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
       "content": [
         {
           "type": "text",
-          "text": "What is the current weather in '"${CITY}"'? Please provide the temperature in both Fahrenheit and Celsius, and show the precipitation forecast for the next 4 hours."
+          "text": "/city-weather:now '"${CITY}"'"
         }
       ]
     },

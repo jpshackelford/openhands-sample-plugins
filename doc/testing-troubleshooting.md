@@ -177,6 +177,7 @@ curl "${STAGING_URL}/api/v1/app-conversations/search" \
 - Plugin `repo_path` not specified for subdirectory plugins
 - Plugin fetch failed silently
 - Plugin manifest not found
+- **Natural language prompt lets agent choose its approach**
 
 **Diagnosis:**
 1. Check if `repo_path` field is needed (for plugins in subdirectories)
@@ -194,7 +195,35 @@ curl "${STAGING_URL}/api/v1/app-conversations/search" \
 }
 ```
 
-### 5. Swagger Docs Require Login
+### 5. Use Slash Commands to Guarantee Plugin Skill Invocation
+
+**Symptom:** Plugin loads successfully but agent uses other tools (like web search) instead of the plugin's skills.
+
+**Cause:** When you use natural language prompts, the agent may recognize the plugin skill but choose a different approach it deems more appropriate.
+
+**Solution:** Use slash commands to directly invoke plugin skills:
+
+```bash
+# ❌ Natural language - agent may choose different tools
+"text": "What is the weather in Tokyo?"
+
+# ✅ Slash command - directly invokes plugin skill
+"text": "/city-weather:now Tokyo"
+```
+
+**How to find available slash commands:**
+- Check the plugin's `commands/` directory
+- Each `.md` file corresponds to a command: `/<plugin-name>:<command> <args>`
+- Example: `commands/now.md` → `/city-weather:now <city>`
+
+**Test Results Comparison:**
+
+| Approach | Plugin Skill Used? | Tools Invoked |
+|----------|-------------------|---------------|
+| Natural language: "What is the weather in Tokyo?" | ❌ No (agent chose differently) | `tavily_tavily_search` |
+| Slash command: `/city-weather:now Tokyo` | ✅ Yes | `terminal` (curl) as plugin specifies |
+
+### 6. Swagger Docs Require Login
 
 **Symptom:** Accessing `${STAGING_URL}/docs` redirects to GitHub OAuth login.
 
