@@ -42,9 +42,8 @@ export STAGING_URL="https://ohpr-XXXXX-XX.staging.all-hands.dev"
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/app-conversations` | Create a new conversation (with optional plugin) |
-| GET | `/api/v1/app-conversations?ids={id}` | Get conversation status (note: `ids` param required) |
-| GET | `/api/v1/app-conversations?ids={id1},{id2}` | Get multiple conversations |
+| POST | `/api/v1/app-conversations` | Create a new conversation (with optional plugins) |
+| GET | `/api/v1/app-conversations/search` | List/search conversations with status and runtime info |
 
 ### Swagger Documentation
 ```
@@ -58,9 +57,9 @@ ${STAGING_URL}/docs
 
 The Agent Server runs **inside the sandbox** and has its own REST API. You get its URL from the conversation response.
 
-### Getting the Agent Server URL
+### Getting the Runtime URL and Session Key
 
-After creating a conversation, poll until `agent_server_url` is populated:
+After creating a conversation, use the search endpoint to get runtime connection info:
 
 ```bash
 # Create conversation
@@ -71,46 +70,53 @@ RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
 
 CONVERSATION_ID=$(echo "$RESPONSE" | jq -r '.id')
 
-# Poll until agent_server_url is available
-curl -s "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" \
-  -H "Authorization: Bearer ${API_KEY}" | jq '.[0] | {sandbox_status, agent_server_url}'
+# Use search endpoint to get conversation details including runtime URL
+curl -s "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" | jq --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | {sandbox_status, conversation_url, session_api_key}'
 ```
 
 **Example Response (when ready):**
 ```json
 {
-  "sandbox_status": "running",
-  "agent_server_url": "https://runtime-xxxxx.staging.all-hands.dev"
+  "sandbox_status": "RUNNING",
+  "conversation_url": "https://xxxxx.staging-runtime.all-hands.dev/api/conversations/abc123",
+  "session_api_key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 }
 ```
 
-### Agent Server Swagger Documentation
-Once you have the agent server URL:
-```
-${AGENT_SERVER_URL}/docs
-```
+### Querying the Runtime (Agent Server)
 
-### Key Agent Server Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/conversations` | List conversations on this agent server |
-| GET | `/api/v1/conversations/{id}` | Get conversation details |
-| GET | `/api/v1/conversations/{id}/events` | Get conversation events |
-| POST | `/api/v1/conversations/{id}/messages` | Send a message |
-
-### Example: List Conversations on Agent Server
+To query conversation events directly from the runtime, use the `conversation_url` with the `X-Session-API-Key` header:
 
 ```bash
-AGENT_SERVER_URL="https://runtime-xxxxx.staging.all-hands.dev"
+# Get conversation_url and session_api_key from search endpoint first
+CONVERSATION_URL="https://xxxxx.staging-runtime.all-hands.dev/api/conversations/abc123"
+SESSION_API_KEY="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
-curl -s "${AGENT_SERVER_URL}/api/v1/conversations" | jq '.'
+# Query events from the runtime
+curl -s "${CONVERSATION_URL}/events/search" \
+  -H "X-Session-API-Key: ${SESSION_API_KEY}" | jq '.items[] | {kind, source}'
 ```
+
+### Key Runtime Endpoints
+
+| Method | Endpoint | Auth Header | Description |
+|--------|----------|-------------|-------------|
+| GET | `{conversation_url}/events/search` | `X-Session-API-Key` | Get conversation events |
 
 ### Example: Get Conversation Events
 
 ```bash
-curl -s "${AGENT_SERVER_URL}/api/v1/conversations/${CONVERSATION_ID}/events" | jq '.'
+# Extract from search response
+CONV_INFO=$(curl -s "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" | jq --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id)')
+
+CONVERSATION_URL=$(echo "$CONV_INFO" | jq -r '.conversation_url')
+SESSION_API_KEY=$(echo "$CONV_INFO" | jq -r '.session_api_key')
+
+# Query events
+curl -s "${CONVERSATION_URL}/events/search" \
+  -H "X-Session-API-Key: ${SESSION_API_KEY}" | jq '.items[] | {kind, source, text: (.llm_message.content[0].text // null)}'
 ```
 
 This is useful for debugging plugin loading - look for events related to skill loading.
@@ -125,11 +131,11 @@ This is useful for debugging plugin loading - look for events related to skill l
 
 **Cause:** Some URL patterns are handled by the frontend router, not the API.
 
-**Solution:** Always use the `/api/v1/` prefix for API calls:
+**Solution:** Use the correct API endpoints:
 
 ```bash
-# ✅ Correct - API endpoint
-curl "${STAGING_URL}/api/v1/app-conversations?ids=${ID}" -H "Authorization: Bearer ${API_KEY}"
+# ✅ Correct - Use search endpoint for listing conversations
+curl "${STAGING_URL}/api/v1/app-conversations/search" -H "Authorization: Bearer ${API_KEY}"
 
 # ❌ Wrong - Frontend route (returns HTML)
 curl "${STAGING_URL}/api/v1/app-conversations/${ID}" -H "Authorization: Bearer ${API_KEY}"
@@ -138,30 +144,25 @@ curl "${STAGING_URL}/api/v1/app-conversations/${ID}" -H "Authorization: Bearer $
 curl "${STAGING_URL}/conversations/${ID}/events" -H "Authorization: Bearer ${API_KEY}"
 ```
 
-### 2. GET Conversations Returns Validation Error
+### 2. Finding Your Conversation
 
-**Symptom:** 
-```json
-{"detail":[{"type":"missing","loc":["query","ids"],"msg":"Field required"}]}
-```
+**Symptom:** Can't find or query a specific conversation.
 
-**Cause:** The `ids` query parameter is required.
-
-**Solution:** Include the `?ids=` parameter:
+**Solution:** Use the search endpoint and filter by ID:
 
 ```bash
-# ✅ Correct
-curl "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" -H "Authorization: Bearer ${API_KEY}"
+# ✅ Correct - use search endpoint
+curl "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" | jq --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id)'
 ```
 
-### 3. Conversation Returns `[null]`
+### 3. Conversation Not Appearing in Search
 
-**Symptom:** GET request returns `[null]` instead of conversation data.
+**Symptom:** Newly created conversation doesn't appear in search results.
 
 **Possible Causes:**
 - Conversation is still initializing (sandbox starting up)
 - Conversation failed to start
-- Invalid conversation ID
 
 **Solution:** 
 - Wait longer (sandbox startup takes 30-90+ seconds)
@@ -173,23 +174,23 @@ curl "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" -H "Author
 **Symptom:** Agent answers questions using tools like `tavily_tavily_search` instead of plugin-provided skills.
 
 **Possible Causes:**
-- Plugin path not specified for subdirectory plugins
+- Plugin `repo_path` not specified for subdirectory plugins
 - Plugin fetch failed silently
 - Plugin manifest not found
 
 **Diagnosis:**
-1. Check if `path` field is needed (for plugins in subdirectories)
+1. Check if `repo_path` field is needed (for plugins in subdirectories)
 2. Look at conversation events for plugin loading logs
 3. Verify the plugin repository structure
 
 **Solution for this repository:**
 ```json
 {
-  "plugin": {
+  "plugins": [{
     "source": "github:jpshackelford/openhands-sample-plugins",
     "ref": "main",
-    "path": "plugins/city-weather"  // Required - plugin is in subdirectory
-  }
+    "repo_path": "plugins/city-weather"
+  }]
 }
 ```
 
@@ -255,7 +256,7 @@ openhands-sample-plugins/
         └── commands/
 ```
 
-**Key Point:** The root level does NOT have a plugin manifest. You must use `path: "plugins/city-weather"` to point to the actual plugin.
+**Key Point:** The root level does NOT have a plugin manifest. You must use `repo_path: "plugins/city-weather"` to point to the actual plugin.
 
 ---
 
@@ -270,7 +271,7 @@ API_KEY="${API_KEY:?Set API_KEY}"
 
 echo "=== Testing API Connectivity ==="
 curl -s -o /dev/null -w "Status: %{http_code}\n" \
-  "${STAGING_URL}/api/v1/app-conversations?ids=test" \
+  "${STAGING_URL}/api/v1/app-conversations/search" \
   -H "Authorization: Bearer ${API_KEY}"
 
 echo ""
@@ -280,11 +281,11 @@ RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
   -H "Content-Type: application/json" \
   -d '{
     "initial_message": {"content": [{"type": "text", "text": "Hello"}]},
-    "plugin": {
+    "plugins": [{
       "source": "github:jpshackelford/openhands-sample-plugins",
       "ref": "main",
-      "path": "plugins/city-weather"
-    }
+      "repo_path": "plugins/city-weather"
+    }]
   }')
 
 echo "Response: $RESPONSE"
@@ -295,8 +296,8 @@ if [ "$ID" != "FAILED" ] && [ "$ID" != "null" ]; then
   echo ""
   echo "=== Checking Status (wait 10s) ==="
   sleep 10
-  curl -s "${STAGING_URL}/api/v1/app-conversations?ids=${ID}" \
-    -H "Authorization: Bearer ${API_KEY}" | jq '.[0] | {id, status, sandbox_status}'
+  curl -s "${STAGING_URL}/api/v1/app-conversations/search" \
+    -H "Authorization: Bearer ${API_KEY}" | jq --arg id "$ID" '.items[] | select(.id == $id) | {id, sandbox_status, conversation_url}'
 fi
 ```
 

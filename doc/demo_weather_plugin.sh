@@ -70,7 +70,7 @@ echo "  City: $CITY"
 echo ""
 
 # Create conversation with plugin
-# Note: The city-weather plugin is in a subdirectory, so we must specify the path
+# Note: The city-weather plugin is in a subdirectory, so we must specify repo_path
 echo -e "${YELLOW}Creating conversation with city-weather plugin...${NC}"
 
 RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
@@ -85,11 +85,11 @@ RESPONSE=$(curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
         }
       ]
     },
-    "plugin": {
+    "plugins": [{
       "source": "github:jpshackelford/openhands-sample-plugins",
       "ref": "main",
-      "path": "plugins/city-weather"
-    }
+      "repo_path": "plugins/city-weather"
+    }]
   }')
 
 # Extract conversation ID
@@ -116,13 +116,13 @@ ATTEMPT=0
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     ATTEMPT=$((ATTEMPT + 1))
     
-    # Note: The GET endpoint requires ?ids= query parameter
-    STATUS_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" \
+    # Use the search endpoint to get conversation status
+    STATUS_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
       -H "Authorization: Bearer ${API_KEY}")
     
-    # Response is an array, extract first element
-    SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.[0].sandbox_status // "pending"')
-    TITLE=$(echo "$STATUS_RESPONSE" | jq -r '.[0].title // "Untitled"')
+    # Find our conversation in the results
+    SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | .sandbox_status // "pending"')
+    TITLE=$(echo "$STATUS_RESPONSE" | jq -r --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | .title // "Untitled"')
     
     printf "\r  Attempt %d/%d: sandbox_status=%s          " "$ATTEMPT" "$MAX_ATTEMPTS" "$SANDBOX_STATUS"
     
