@@ -4,16 +4,14 @@
 
 **Agent Skills support is now available in the software-agent-sdk.** The SDK supports loading plugins with skills, hooks, and MCP configuration via the `Plugin.load()` and `Plugin.fetch()` APIs.
 
-### Experimental: Launching Plugins from OpenHands Cloud
+### Plugin Loading from OpenHands Cloud
 
-There is experimental, unmerged capability for launching plugins directly from OpenHands Cloud. This work is tracked in the following PRs and issues:
+Plugin loading is now supported in OpenHands Cloud! The following PRs have been merged:
 
-| Repository | Issue/PR | Description |
-|------------|----------|-------------|
-| OpenHands/OpenHands | [#12316](https://github.com/OpenHands/OpenHands/issues/12316) | Support for bare git repository plugin marketplaces |
-| OpenHands/software-agent-sdk | [#1645](https://github.com/OpenHands/software-agent-sdk/issues/1645) | Add `Plugin.fetch()` for remote plugin fetching and caching |
-| OpenHands/software-agent-sdk | [#1650](https://github.com/OpenHands/software-agent-sdk/issues/1650) | Agent Server: Load plugins when starting conversations |
-| OpenHands/OpenHands | [#12321](https://github.com/OpenHands/OpenHands/issues/12321) | App Server: Accept plugin spec in conversation start API |
+| Repository | PR | Description | Status |
+|------------|----------|-------------|--------|
+| OpenHands/software-agent-sdk | [#1651](https://github.com/OpenHands/software-agent-sdk/pull/1651) | Agent Server: Support plugin loading when starting conversations | ✅ Merged |
+| OpenHands/OpenHands | [#12338](https://github.com/OpenHands/OpenHands/pull/12338) | App Server: Accept plugin spec in conversation start API | 🔄 In Review |
 
 > **📋 API Design Documentation:** See [OpenHands Issue #12087 comment](https://github.com/OpenHands/OpenHands/issues/12087#issuecomment-3733464400) for the complete API shape across App Server, Agent Server, and SDK layers.
 
@@ -25,7 +23,7 @@ This demo shows how to launch a conversation with the city-weather plugin loaded
 
 ### Prerequisites
 
-- Access to a staging deployment with the experimental plugin PRs merged
+- Access to a staging or preview deployment with plugin support
 - An API key for the environment
 
 ### Quick Start Script
@@ -51,7 +49,7 @@ export API_KEY="sk-oh-YOUR_API_KEY_HERE"
 
 #### 2. Create Conversation with Plugin
 
-> **Important:** The city-weather plugin is in a subdirectory, so you must specify the `path` field.
+> **Important:** The city-weather plugin is in a subdirectory, so you must specify the `repo_path` field.
 
 ```bash
 curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
@@ -66,11 +64,11 @@ curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
         }
       ]
     },
-    "plugin": {
+    "plugins": [{
       "source": "github:jpshackelford/openhands-sample-plugins",
       "ref": "main",
-      "path": "plugins/city-weather"
-    }
+      "repo_path": "plugins/city-weather"
+    }]
   }' | jq '{id, status}'
 ```
 
@@ -84,15 +82,14 @@ curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
 
 #### 3. Poll for Sandbox Ready
 
-> **Note:** The GET endpoint requires the `?ids=` query parameter and returns an array.
+Use the search endpoint to check conversation status:
 
 ```bash
 CONVERSATION_ID="your-conversation-id-here"
 
-# Check status (repeat until sandbox_status is "running")
-# Note: Response is an array even for single ID
-curl -s -X GET "${STAGING_URL}/api/v1/app-conversations?ids=${CONVERSATION_ID}" \
-  -H "Authorization: Bearer ${API_KEY}" | jq '.[0] | {id, title, sandbox_status}'
+# Check status (repeat until sandbox_status is "RUNNING")
+curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" | jq --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | {id, title, sandbox_status}'
 ```
 
 #### 4. View in Browser
@@ -111,7 +108,7 @@ ${STAGING_URL}/conversations/${CONVERSATION_ID}
 | Git URL | `https://github.com/jpshackelford/openhands-sample-plugins.git` |
 | Local path | `/path/to/openhands-sample-plugins` |
 
-> **Note:** For plugins in subdirectories (like in marketplace repos), use the `path` field separately. Do not append the path to the source string.
+> **Note:** For plugins in subdirectories (like in marketplace repos), use the `repo_path` field separately. Do not append the path to the source string.
 
 ---
 
@@ -133,7 +130,8 @@ The city-weather plugin provides instructions for fetching weather data using th
 ## Notes
 
 - Plugin loading happens inside the sandbox/runtime, not on the app server
-- Use the `path` field for plugins in subdirectories (do not append to source string)
+- Use the `repo_path` field for plugins in subdirectories (do not append to source string)
+- The `plugins` field is an array, allowing multiple plugins to be loaded
 - Sandbox startup typically takes 30-90 seconds depending on load
 - The plugin uses the free Open-Meteo API which requires no API key
 - See [testing-troubleshooting.md](testing-troubleshooting.md) for API troubleshooting tips
