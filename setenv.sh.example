@@ -9,8 +9,8 @@
 #   ./doc/demo_weather_plugin.sh "Fullerton CA"
 #
 
-export STAGING_URL="https://your-staging-url.staging.all-hands.dev"
-export API_KEY="sk-oh-your-api-key-here"
+export STAGING_URL="https://your-staging-url.all-hands.dev"
+export API_KEY="sk-oh-YOUR_API_KEY_HERE"
 
 echo "Environment variables set:"
 echo "  STAGING_URL: $STAGING_URL"

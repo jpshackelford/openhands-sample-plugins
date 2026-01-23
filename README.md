@@ -77,8 +77,8 @@ To test the plugin with OpenHands Cloud:
 
 2. **Edit `setenv.sh` with your credentials:**
    ```bash
-   export STAGING_URL="https://your-staging-url.staging.all-hands.dev"
-   export API_KEY="sk-oh-your-api-key-here"
+   export STAGING_URL="https://your-staging-url.all-hands.dev"
+   export API_KEY="sk-oh-YOUR_API_KEY_HERE"
    ```
 
 3. **Source the environment file:**
