@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Source this file to set up environment variables for running the demo:
+#   cp setenv.sh.example setenv.sh
+#   # Edit setenv.sh with your credentials
+#   source ./setenv.sh
+#
+# Then run the demo:
+#   ./doc/demo_weather_plugin.sh "Fullerton CA"
+#
+
+export STAGING_URL="https://your-staging-url.staging.all-hands.dev"
+export API_KEY="sk-oh-your-api-key-here"
+
+echo "Environment variables set:"
+echo "  STAGING_URL: $STAGING_URL"
+echo "  API_KEY: ${API_KEY:0:15}..." 
+echo ""
+echo "Ready to run demo. Example:"
+echo '  ./doc/demo_weather_plugin.sh "Fullerton CA"'

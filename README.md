@@ -66,6 +66,35 @@ This marketplace is compatible with OpenHands plugin support. See the [OpenHands
 
 This plugin uses the free [Open-Meteo API](https://open-meteo.com/) which requires no API key.
 
+## Testing with OpenHands Cloud
+
+To test the plugin with OpenHands Cloud:
+
+1. **Create a local environment file:**
+   ```bash
+   cp setenv.sh.example setenv.sh
+   ```
+
+2. **Edit `setenv.sh` with your credentials:**
+   ```bash
+   export STAGING_URL="https://your-staging-url.staging.all-hands.dev"
+   export API_KEY="sk-oh-your-api-key-here"
+   ```
+
+3. **Source the environment file:**
+   ```bash
+   source ./setenv.sh
+   ```
+
+4. **Run the demo:**
+   ```bash
+   ./doc/demo_weather_plugin.sh "Fullerton CA"
+   ```
+
+The demo script will create a conversation with the plugin loaded, wait for the sandbox to start, and open it in your browser.
+
+For more details, see the [Plugin Capability Status](doc/plugin-capability-status.md) documentation.
+
 ## License
 
 MIT
