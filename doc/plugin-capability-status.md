@@ -104,7 +104,7 @@ curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
       "content": [
         {
           "type": "text",
-          "text": "What is the current weather in Tokyo? Please provide the temperature in both Fahrenheit and Celsius, and show the precipitation forecast for the next 4 hours."
+          "text": "/city-weather:now Tokyo"
         }
       ]
     },
