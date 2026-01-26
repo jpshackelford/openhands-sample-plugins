@@ -3,10 +3,7 @@
 Example: Loading a Claude Code format plugin with software-agent-sdk.
 
 This demonstrates loading the city-weather plugin and using it to
-fetch weather information.
-
-NOTE: Slash commands like /city-weather:now are NOT supported by the SDK.
-See doc/software-agent-sdk-usage.md "Gotchas" section for details.
+fetch weather information via slash command.
 """
 
 import os
@@ -52,10 +49,6 @@ def main():
 
     # Create agent context with the loaded skills
     # The skill content will be included in the system prompt
-    #
-    # NOTE: The skill is loaded as "always active" because Claude Code
-    # command files don't have a `triggers:` field. This means the
-    # weather instructions are always in context, not triggered on-demand.
     agent_context = AgentContext(skills=list(repo_skills.values()))
 
     # Create agent with terminal access for curl commands
@@ -65,17 +58,11 @@ def main():
     # Create conversation
     conversation = Conversation(agent=agent, workspace=os.getcwd())
 
-    # Ask about weather using natural language
-    #
-    # IMPORTANT: Do NOT use slash command syntax like "/city-weather:now Tokyo"
-    # The SDK does not parse slash commands or substitute $ARGUMENTS.
-    # See doc/software-agent-sdk-usage.md "Gotchas" section for details.
-    #
-    # Instead, just describe what you want - the skill instructions are
-    # already in the agent's context.
-    print("\nAsking: What's the weather in Tokyo?")
+    # Use slash command to invoke the plugin
+    # The SDK parses the command and substitutes $ARGUMENTS with "Tokyo"
+    print("\nRunning: /city-weather:now Tokyo")
     print("-" * 40)
-    conversation.send_message("What's the weather in Tokyo?")
+    conversation.send_message("/city-weather:now Tokyo")
     conversation.run()
 
     print(f"\nTotal cost: ${llm.metrics.accumulated_cost:.4f}")

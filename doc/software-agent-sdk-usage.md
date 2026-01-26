@@ -45,8 +45,6 @@ llm = LLM(
 )
 
 # Create agent context with loaded skills
-# NOTE: Slash commands like /city-weather:now are not supported.
-# See the "Gotchas" section below for details.
 agent_context = AgentContext(
     skills=list(repo_skills.values())
 )
@@ -58,9 +56,9 @@ agent = Agent(llm=llm, tools=tools, agent_context=agent_context)
 # Create conversation
 conversation = Conversation(agent=agent, workspace=os.getcwd())
 
-# Send a message - the skill instructions are already in context,
-# so the agent knows how to fetch weather data
-conversation.send_message("What's the weather in Tokyo?")
+# Use slash command to invoke the plugin
+# The SDK parses the command and substitutes $ARGUMENTS with "Tokyo"
+conversation.send_message("/city-weather:now Tokyo")
 conversation.run()
 ```
 
@@ -74,7 +72,7 @@ Here's a full working example:
 Example: Loading a Claude Code format plugin with software-agent-sdk.
 
 This demonstrates loading the city-weather plugin and using it to
-fetch weather information.
+fetch weather information via slash command.
 """
 
 import os
@@ -126,11 +124,11 @@ def main():
     # Create conversation
     conversation = Conversation(agent=agent, workspace=os.getcwd())
 
-    # Ask about weather - the agent has the instructions in context
-    # and will use curl to fetch from Open-Meteo API
-    print("\nAsking: What's the weather in Tokyo?")
+    # Use slash command to invoke the plugin
+    # The SDK parses the command and substitutes $ARGUMENTS with "Tokyo"
+    print("\nRunning: /city-weather:now Tokyo")
     print("-" * 40)
-    conversation.send_message("What's the weather in Tokyo?")
+    conversation.send_message("/city-weather:now Tokyo")
     conversation.run()
 
     print(f"\nTotal cost: ${llm.metrics.accumulated_cost:.4f}")
@@ -168,30 +166,29 @@ python doc/example_weather.py
 
 ---
 
-## Gotchas
+## Slash Commands
 
-### Slash Commands Are Not Supported
+The SDK supports Claude Code-style slash commands for invoking plugin skills:
 
-**The software-agent-sdk does not implement Claude Code's slash command system.**
-
-In Claude Code, you would invoke this plugin with:
 ```
 /city-weather:now Tokyo
 ```
 
-This syntax triggers the command and substitutes `Tokyo` into the `$ARGUMENTS` placeholder in the skill content.
+This syntax:
+1. Triggers the `now` command from the `city-weather` plugin
+2. Substitutes `Tokyo` into the `$ARGUMENTS` placeholder in the skill content
 
-**In the software-agent-sdk:**
-- The `/city-weather:now` syntax has no special meaning
-- No command parsing occurs
-- The `$ARGUMENTS` placeholder is not substituted - it remains as literal text
+### How It Works
 
-**Workaround**: Simply describe what you want naturally:
-```
-What's the weather in Tokyo?
-```
+When you send a message like `/city-weather:now Tokyo`:
+- The SDK parses the slash command syntax
+- Identifies the plugin (`city-weather`) and command (`now`)
+- Substitutes the arguments (`Tokyo`) for `$ARGUMENTS` in the skill content
+- The agent receives the skill instructions with the city name already filled in
 
-The skill instructions are already in the agent's context, so it knows how to fulfill weather requests.
+---
+
+## Notes
 
 ### Skills Load as "Always Active" (No Triggers)
 
@@ -217,21 +214,6 @@ allowed-tools: Bash(curl:*)
 
 However, this breaks Claude Code compatibility since Claude Code doesn't recognize the `triggers` field.
 
-### The `$ARGUMENTS` Placeholder
-
-Claude Code replaces `$ARGUMENTS` with the text after the slash command:
-```
-/city-weather:now Tokyo  →  $ARGUMENTS = "Tokyo"
-```
-
-The software-agent-sdk does **not** perform this substitution. The placeholder remains as literal text in the skill content:
-
-```markdown
-1. Parse the city name from the arguments: **$ARGUMENTS**
-```
-
-The LLM will see `$ARGUMENTS` in the instructions but will typically understand from context that it should use the city name from the user's message.
-
 ### Directory Structure Expectations
 
 The SDK expects skills in specific locations:
@@ -249,8 +231,8 @@ Claude Code's structure (`commands/now.md`) works because any `.md` file with fr
 | Load `.md` with frontmatter | ✅ | ✅ |
 | Parse `description` | ✅ | ✅ |
 | Parse `allowed-tools` | ✅ | ✅ |
-| Slash command invocation | ✅ `/cmd:name args` | ❌ |
-| `$ARGUMENTS` substitution | ✅ | ❌ |
+| Slash command invocation | ✅ `/cmd:name args` | ✅ |
+| `$ARGUMENTS` substitution | ✅ | ✅ |
 | `argument-hint` field | ✅ | ❌ Ignored |
 | Keyword triggers | ❌ | ✅ via `triggers:` field |
 | Always-active skills | ✅ | ✅ (default) |
