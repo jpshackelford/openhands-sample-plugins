@@ -2,18 +2,62 @@
 
 ## Current State
 
-**Agent Skills support is now available in the software-agent-sdk.** The SDK supports loading plugins with skills, hooks, and MCP configuration via the `Plugin.load()` and `Plugin.fetch()` APIs.
+> **🎉 SDK 1.10.0 Released!** Full plugin support with slash commands is now available.
+> Install with `pip install openhands-sdk>=1.10.0`
 
-### Plugin Loading from OpenHands Cloud
+**Full plugin support is now available in the OpenHands SDK 1.10.0+.** The SDK supports:
 
-Plugin loading is now supported in OpenHands Cloud! The following PRs have been merged:
+- Loading plugins from GitHub, git URLs, or local paths via `Plugin.fetch()` and `Plugin.load()`
+- Slash commands converted to `KeywordTrigger` skills (e.g., `/city-weather:now`)
+- Skills, hooks, MCP configuration, and agent definitions
+- Plugin marketplaces via the `Marketplace` class
+
+### Plugin Loading Support
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| **software-agent-sdk** | ✅ **1.10.0+ Released** | Full plugin support with `Conversation(plugins=[...])` |
+| **OpenHands Cloud** | ✅ Supported | Plugin loading via API with `plugins` field |
+| **Claude Code** | ✅ Compatible | Same plugin format works in both systems |
+
+### Key PRs
 
 | Repository | PR | Description | Status |
 |------------|----------|-------------|--------|
 | OpenHands/software-agent-sdk | [#1651](https://github.com/OpenHands/software-agent-sdk/pull/1651) | Agent Server: Support plugin loading when starting conversations | ✅ Merged |
-| OpenHands/OpenHands | [#12338](https://github.com/OpenHands/OpenHands/pull/12338) | App Server: Accept plugin spec in conversation start API | 🔄 In Review |
+| OpenHands/OpenHands | [#12338](https://github.com/OpenHands/OpenHands/pull/12338) | App Server: Accept plugin spec in conversation start API | ✅ Merged |
 
 > **📋 API Design Documentation:** See [OpenHands Issue #12087 comment](https://github.com/OpenHands/OpenHands/issues/12087#issuecomment-3733464400) for the complete API shape across App Server, Agent Server, and SDK layers.
+
+---
+
+## Demo: Using the SDK Directly
+
+With SDK 1.10.0+, you can load and use plugins directly in Python:
+
+```python
+from openhands.sdk import Agent, Conversation, LLM
+from openhands.sdk.plugin import PluginSource
+from pydantic import SecretStr
+
+llm = LLM(model="anthropic/claude-sonnet-4-20250514", api_key=SecretStr("..."))
+agent = Agent(llm=llm, tools=[...])
+
+# Load plugin and use slash command
+conversation = Conversation(
+    agent=agent,
+    plugins=[
+        PluginSource(
+            source="github:jpshackelford/openhands-sample-plugins",
+            repo_path="plugins/city-weather"
+        )
+    ]
+)
+conversation.send_message("/city-weather:now Tokyo")
+conversation.run()
+```
+
+See [software-agent-sdk-usage.md](software-agent-sdk-usage.md) for the complete guide.
 
 ---
 
@@ -23,7 +67,7 @@ This demo shows how to launch a conversation with the city-weather plugin loaded
 
 ### Prerequisites
 
-- Access to a staging or preview deployment with plugin support
+- Access to OpenHands Cloud (app.all-hands.dev or staging environment)
 - An API key for the environment
 
 ### Quick Start Script
@@ -123,7 +167,7 @@ The city-weather plugin provides instructions for fetching weather data using th
    - Temperature in °F and °C
    - Precipitation forecast for next 4 hours
 
-**Note:** The plugin instructions are loaded as an always-active skill. See [software-agent-sdk-usage.md](software-agent-sdk-usage.md) for details on how skill loading works and its limitations.
+**Note:** With SDK 1.10.0+, commands are loaded with `KeywordTrigger` so they activate only when you use the slash command (e.g., `/city-weather:now`). See [software-agent-sdk-usage.md](software-agent-sdk-usage.md) for the complete SDK usage guide.
 
 ---
 
