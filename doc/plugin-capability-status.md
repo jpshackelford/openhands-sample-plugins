@@ -70,6 +70,26 @@ This demo shows how to launch a conversation with the city-weather plugin loaded
 - Access to OpenHands Cloud (app.all-hands.dev or staging environment)
 - An API key for the environment
 
+### Understanding the Architecture
+
+OpenHands uses a **two-server architecture**:
+
+| Server | Location | Auth Header | Purpose |
+|--------|----------|-------------|---------|
+| **App Server** | `${STAGING_URL}` | `Authorization: Bearer ${API_KEY}` | Manages conversations, users, orchestration |
+| **Agent Server** | Inside sandbox (runtime URL) | `X-Session-API-Key: ${SESSION_KEY}` | Runs the agent, loads plugins, executes tools |
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   API Client    │────▶│   App Server    │────▶│  Agent Server   │
+│                 │     │  (Cloud URL)    │     │  (In Sandbox)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                              │                        │
+                              │ Creates sandbox,       │ Fetches plugin,
+                              │ passes plugin spec     │ loads skills,
+                              │                        │ runs conversation
+```
+
 ### Quick Start Script
 
 Use the [demo_weather_plugin.sh](demo_weather_plugin.sh) script in this directory:
@@ -126,21 +146,66 @@ curl -s -X POST "${STAGING_URL}/api/v1/app-conversations" \
 
 #### 3. Poll for Sandbox Ready
 
-Use the search endpoint to check conversation status:
+> **⚠️ Important:** Use the **search endpoint** to find conversations. GET requests to `/api/v1/app-conversations/{id}` return HTML, not JSON.
+
+Sandbox startup typically takes **30-90 seconds**. Poll until `sandbox_status` is `"RUNNING"` and `conversation_url` is populated:
 
 ```bash
-CONVERSATION_ID="your-conversation-id-here"
-
-# Check status (repeat until sandbox_status is "RUNNING")
-curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
-  -H "Authorization: Bearer ${API_KEY}" | jq --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | {id, title, sandbox_status}'
+# Poll every 5 seconds (sandbox takes 30-90 seconds to start)
+curl -s "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" \
+  | jq '.items[0] | {id, sandbox_status, conversation_url, session_api_key}'
 ```
 
-#### 4. View in Browser
+**Response when ready:**
+```json
+{
+  "id": "abc123...",
+  "sandbox_status": "RUNNING",
+  "conversation_url": "https://xxxxx.staging-runtime.all-hands.dev/api/conversations/abc123...",
+  "session_api_key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+}
+```
+
+#### 4. Query Conversation Events (Verify Plugin Worked)
+
+To see what the agent did, query events from the **Agent Server** using the runtime URL and `X-Session-API-Key` header:
+
+```bash
+# Extract runtime info from search response
+CONV_INFO=$(curl -s "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" | jq '.items[0]')
+
+CONVERSATION_URL=$(echo "$CONV_INFO" | jq -r '.conversation_url')
+SESSION_API_KEY=$(echo "$CONV_INFO" | jq -r '.session_api_key')
+
+# Query events from the Agent Server (note: different auth header!)
+curl -s "${CONVERSATION_URL}/events/search" \
+  -H "X-Session-API-Key: ${SESSION_API_KEY}" \
+  | jq '.items[] | select(.kind == "MessageEvent") | {source, text: .llm_message.content[0].text[0:200]}'
+```
+
+**Expected output showing plugin worked:**
+```json
+{"source": "user", "text": "/city-weather:now Tokyo"}
+{"source": "agent", "text": "## 🗼 City Weather Report for Tokyo, Japan\n\n**Current Time:** ..."}
+```
+
+#### 5. View in Browser
 
 ```
 ${STAGING_URL}/conversations/${CONVERSATION_ID}
 ```
+
+### Key API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/v1/app-conversations` | `Authorization: Bearer` | Create conversation |
+| GET | `/api/v1/app-conversations/search` | `Authorization: Bearer` | List/find conversations |
+| GET | `{conversation_url}/events/search` | `X-Session-API-Key` | Get conversation events |
+
+> **📖 Full troubleshooting guide:** See [testing-troubleshooting.md](testing-troubleshooting.md) for detailed API documentation and common issues.
 
 ---
 
