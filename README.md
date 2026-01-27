@@ -2,6 +2,9 @@
 
 A sample plugin marketplace demonstrating the Claude Code plugin marketplace format for OpenHands.
 
+> **🎉 SDK 1.10.0 Released!** Full plugin support with slash commands is now available.
+> Install with `pip install openhands-sdk>=1.10.0`
+
 ## Marketplace Structure
 
 This repository follows the [Claude Code plugin marketplace format](https://code.claude.com/docs/en/plugin-marketplaces):
@@ -58,9 +61,28 @@ Then install the city-weather plugin:
 /plugin install city-weather@openhands-sample-plugins
 ```
 
-### OpenHands
+### OpenHands SDK (1.10.0+)
 
-This marketplace is compatible with OpenHands plugin support. See the [OpenHands SDK Skills Guide](https://docs.openhands.dev/sdk/guides/skill) for details on plugin and skill support. For experimental OpenHands Cloud plugin launching, see the [Plugin Capability Status](doc/plugin-capability-status.md) documentation.
+Load plugins directly in Python with full slash command support:
+
+```python
+from openhands.sdk import Agent, Conversation, LLM
+from openhands.sdk.plugin import PluginSource
+
+conversation = Conversation(
+    agent=agent,
+    plugins=[
+        PluginSource(
+            source="github:jpshackelford/openhands-sample-plugins",
+            repo_path="plugins/city-weather"
+        )
+    ]
+)
+conversation.send_message("/city-weather:now Tokyo")
+conversation.run()
+```
+
+See the [SDK Usage Guide](doc/software-agent-sdk-usage.md) for complete documentation.
 
 ## API
 
