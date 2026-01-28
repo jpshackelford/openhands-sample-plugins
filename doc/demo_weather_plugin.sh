@@ -109,54 +109,53 @@ echo ""
 # Wait for sandbox to be ready
 # Note: Sandbox startup can take 30-90+ seconds depending on load
 #
-# IMPORTANT: The conversation ID returned from POST may not match the ID that
-# appears in search results (this appears to be a known quirk). We track the
-# count of conversations before/after to detect when our new one appears.
-echo -e "${YELLOW}Waiting for sandbox to start...${NC}"
+# The POST endpoint returns a "start task" ID, not the actual conversation ID.
+# We need to poll the start-tasks endpoint until status is READY, then get
+# the app_conversation_id from there.
+echo -e "${YELLOW}Waiting for conversation to start...${NC}"
 echo "(This typically takes 30-90 seconds)"
 echo ""
 
-# Get initial count of conversations
-INITIAL_COUNT=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
-  -H "Authorization: Bearer ${API_KEY}" | jq '.items | length')
+# CONVERSATION_ID from POST is actually a task ID - rename for clarity
+TASK_ID="$CONVERSATION_ID"
 
 MAX_ATTEMPTS=45
 ATTEMPT=0
-FOUND_NEW=false
 
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     ATTEMPT=$((ATTEMPT + 1))
     
-    # Use the search endpoint to get conversation status
-    STATUS_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
+    # Poll the start-tasks endpoint to check task status
+    TASK_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/start-tasks/search" \
       -H "Authorization: Bearer ${API_KEY}")
     
-    CURRENT_COUNT=$(echo "$STATUS_RESPONSE" | jq '.items | length')
+    # Find our task by ID
+    TASK_INFO=$(echo "$TASK_RESPONSE" | jq -r --arg id "$TASK_ID" '.items[] | select(.id == $id)')
+    TASK_STATUS=$(echo "$TASK_INFO" | jq -r '.status // "WORKING"')
+    APP_CONVERSATION_ID=$(echo "$TASK_INFO" | jq -r '.app_conversation_id // empty')
     
-    # Check if a new conversation appeared (count increased)
-    if [ "$CURRENT_COUNT" -gt "$INITIAL_COUNT" ] || [ "$FOUND_NEW" == "true" ]; then
-        FOUND_NEW=true
-        # Get the most recent conversation's status and ID
-        SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.items[0].sandbox_status // "pending"')
-        CONVERSATION_ID=$(echo "$STATUS_RESPONSE" | jq -r '.items[0].id // empty')
-        TITLE=$(echo "$STATUS_RESPONSE" | jq -r '.items[0].title // "Untitled"')
-    else
-        SANDBOX_STATUS="waiting for conversation..."
-    fi
+    printf "\r  Attempt %d/%d: task_status=%s          " "$ATTEMPT" "$MAX_ATTEMPTS" "$TASK_STATUS"
     
-    printf "\r  Attempt %d/%d: %s          " "$ATTEMPT" "$MAX_ATTEMPTS" "$SANDBOX_STATUS"
-    
-    # Note: API returns uppercase status values (RUNNING, PAUSED, etc.)
-    if [ "$SANDBOX_STATUS" == "RUNNING" ]; then
+    if [ "$TASK_STATUS" == "READY" ] && [ -n "$APP_CONVERSATION_ID" ] && [ "$APP_CONVERSATION_ID" != "null" ]; then
         echo ""
-        echo -e "${GREEN}Sandbox is ready!${NC}"
+        echo -e "${GREEN}Task complete! Conversation ID: ${APP_CONVERSATION_ID}${NC}"
+        
+        # Now get the actual conversation details
+        CONV_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
+          -H "Authorization: Bearer ${API_KEY}")
+        
+        CONVERSATION_ID="$APP_CONVERSATION_ID"
+        SANDBOX_STATUS=$(echo "$CONV_RESPONSE" | jq -r --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | .sandbox_status // "UNKNOWN"')
+        TITLE=$(echo "$CONV_RESPONSE" | jq -r --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | .title // "Untitled"')
+        
+        echo -e "${GREEN}Sandbox status: ${SANDBOX_STATUS}${NC}"
         break
     fi
     
-    if [ "$SANDBOX_STATUS" == "FAILED" ] || [ "$SANDBOX_STATUS" == "ERROR" ]; then
+    if [ "$TASK_STATUS" == "ERROR" ]; then
+        DETAIL=$(echo "$TASK_INFO" | jq -r '.detail // "Unknown error"')
         echo ""
-        echo -e "${RED}Sandbox failed to start${NC}"
-        echo "Response: $STATUS_RESPONSE"
+        echo -e "${RED}Task failed: ${DETAIL}${NC}"
         exit 1
     fi
     
@@ -165,7 +164,7 @@ done
 
 if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
     echo ""
-    echo -e "${YELLOW}Warning: Sandbox may still be starting${NC}"
+    echo -e "${YELLOW}Warning: Task may still be running${NC}"
 fi
 
 # Output results
