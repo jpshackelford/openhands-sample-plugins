@@ -108,12 +108,21 @@ echo ""
 
 # Wait for sandbox to be ready
 # Note: Sandbox startup can take 30-90+ seconds depending on load
+#
+# IMPORTANT: The conversation ID returned from POST may not match the ID that
+# appears in search results (this appears to be a known quirk). We track the
+# count of conversations before/after to detect when our new one appears.
 echo -e "${YELLOW}Waiting for sandbox to start...${NC}"
 echo "(This typically takes 30-90 seconds)"
 echo ""
 
+# Get initial count of conversations
+INITIAL_COUNT=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
+  -H "Authorization: Bearer ${API_KEY}" | jq '.items | length')
+
 MAX_ATTEMPTS=45
 ATTEMPT=0
+FOUND_NEW=false
 
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     ATTEMPT=$((ATTEMPT + 1))
@@ -122,19 +131,29 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     STATUS_RESPONSE=$(curl -s -X GET "${STAGING_URL}/api/v1/app-conversations/search" \
       -H "Authorization: Bearer ${API_KEY}")
     
-    # Find our conversation in the results
-    SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | .sandbox_status // "pending"')
-    TITLE=$(echo "$STATUS_RESPONSE" | jq -r --arg id "$CONVERSATION_ID" '.items[] | select(.id == $id) | .title // "Untitled"')
+    CURRENT_COUNT=$(echo "$STATUS_RESPONSE" | jq '.items | length')
     
-    printf "\r  Attempt %d/%d: sandbox_status=%s          " "$ATTEMPT" "$MAX_ATTEMPTS" "$SANDBOX_STATUS"
+    # Check if a new conversation appeared (count increased)
+    if [ "$CURRENT_COUNT" -gt "$INITIAL_COUNT" ] || [ "$FOUND_NEW" == "true" ]; then
+        FOUND_NEW=true
+        # Get the most recent conversation's status and ID
+        SANDBOX_STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.items[0].sandbox_status // "pending"')
+        CONVERSATION_ID=$(echo "$STATUS_RESPONSE" | jq -r '.items[0].id // empty')
+        TITLE=$(echo "$STATUS_RESPONSE" | jq -r '.items[0].title // "Untitled"')
+    else
+        SANDBOX_STATUS="waiting for conversation..."
+    fi
     
-    if [ "$SANDBOX_STATUS" == "running" ]; then
+    printf "\r  Attempt %d/%d: %s          " "$ATTEMPT" "$MAX_ATTEMPTS" "$SANDBOX_STATUS"
+    
+    # Note: API returns uppercase status values (RUNNING, PAUSED, etc.)
+    if [ "$SANDBOX_STATUS" == "RUNNING" ]; then
         echo ""
         echo -e "${GREEN}Sandbox is ready!${NC}"
         break
     fi
     
-    if [ "$SANDBOX_STATUS" == "failed" ] || [ "$SANDBOX_STATUS" == "error" ]; then
+    if [ "$SANDBOX_STATUS" == "FAILED" ] || [ "$SANDBOX_STATUS" == "ERROR" ]; then
         echo ""
         echo -e "${RED}Sandbox failed to start${NC}"
         echo "Response: $STATUS_RESPONSE"
