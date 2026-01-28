@@ -42,8 +42,42 @@ export STAGING_URL="https://ohpr-XXXXX-XX.staging.all-hands.dev"
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/app-conversations` | Create a new conversation (with optional plugins) |
+| POST | `/api/v1/app-conversations` | Create a new conversation start task (returns task ID) |
+| GET | `/api/v1/app-conversations/start-tasks/search` | Check status of start tasks, get actual conversation ID |
 | GET | `/api/v1/app-conversations/search` | List/search conversations with status and runtime info |
+
+### Important: Task ID vs Conversation ID
+
+The POST endpoint returns a **start task**, not the conversation directly:
+
+```bash
+# POST returns a task object
+{
+  "id": "task-uuid-here",           # This is the TASK ID
+  "status": "WORKING",
+  "app_conversation_id": null,      # Null until task completes
+  ...
+}
+```
+
+To get the actual conversation ID:
+1. Poll `/api/v1/app-conversations/start-tasks/search` filtering by task ID
+2. Wait for `status` to become `READY`
+3. Get `app_conversation_id` from the completed task
+4. Use that ID to find the conversation in `/api/v1/app-conversations/search`
+
+```bash
+# Poll start-tasks until READY
+curl -s "${STAGING_URL}/api/v1/app-conversations/start-tasks/search" \
+  -H "Authorization: Bearer ${API_KEY}" \
+  | jq --arg id "$TASK_ID" '.items[] | select(.id == $id) | {status, app_conversation_id}'
+
+# Response when ready:
+{
+  "status": "READY",
+  "app_conversation_id": "actual-conversation-uuid"  # Use THIS ID
+}
+```
 
 ### Swagger Documentation
 ```
