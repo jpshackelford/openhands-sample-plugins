@@ -1,0 +1,9 @@
+{
+  "name": "uuid-generator",
+  "version": "1.1.0",
+  "description": "Generate UUIDs in v4 and v7 formats",
+  "author": {
+    "name": "Utility Plugins Team",
+    "email": "plugins@example.com"
+  }
+}

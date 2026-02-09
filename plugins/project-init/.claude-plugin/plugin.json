@@ -1,0 +1,14 @@
+{
+  "name": "project-init",
+  "version": "2.0.0",
+  "description": "Scaffold new projects from templates with configurable options",
+  "author": {
+    "name": "Scaffolding Team",
+    "email": "scaffold@example.com",
+    "url": "https://github.com/scaffolding"
+  },
+  "homepage": "https://github.com/scaffolding/project-init",
+  "repository": "https://github.com/scaffolding/project-init",
+  "license": "MIT",
+  "keywords": ["scaffold", "template", "project", "init", "boilerplate", "starter"]
+}

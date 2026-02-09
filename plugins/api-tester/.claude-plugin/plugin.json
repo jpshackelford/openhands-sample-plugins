@@ -1,0 +1,12 @@
+{
+  "name": "api-tester",
+  "version": "1.0.0",
+  "description": "Send HTTP requests and validate API responses with assertions",
+  "author": {
+    "name": "API Tools"
+  },
+  "homepage": "https://github.com/api-tools/api-tester",
+  "repository": "https://github.com/api-tools/api-tester",
+  "license": "MIT",
+  "keywords": ["api", "http", "rest", "testing", "curl"]
+}

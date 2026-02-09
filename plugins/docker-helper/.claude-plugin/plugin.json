@@ -1,0 +1,13 @@
+{
+  "name": "docker-helper",
+  "version": "0.9.0",
+  "description": "Manage Docker containers, images, and compose stacks from natural language",
+  "author": {
+    "name": "Container Tools",
+    "email": "containers@example.dev"
+  },
+  "homepage": "https://github.com/container-tools/docker-helper",
+  "repository": "https://github.com/container-tools/docker-helper",
+  "license": "MIT",
+  "keywords": ["docker", "containers", "compose", "devops", "infrastructure"]
+}

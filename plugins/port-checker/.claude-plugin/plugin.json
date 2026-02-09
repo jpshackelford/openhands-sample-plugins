@@ -1,0 +1,13 @@
+{
+  "name": "port-checker",
+  "version": "1.0.0",
+  "description": "Check whether TCP ports are open or closed on a given host",
+  "author": {
+    "name": "NetOps Team",
+    "email": "netops@example.com"
+  },
+  "homepage": "https://github.com/netops/port-checker",
+  "repository": "https://github.com/netops/port-checker",
+  "license": "BSD-3-Clause",
+  "keywords": ["network", "port", "tcp", "connectivity", "diagnostics"]
+}

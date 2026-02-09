@@ -1,0 +1,8 @@
+{
+  "name": "json-formatter",
+  "version": "1.0.0",
+  "description": "Pretty-print and validate JSON data with syntax highlighting",
+  "author": {
+    "name": "DevTools Contributors"
+  }
+}
