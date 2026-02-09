@@ -1,0 +1,4 @@
+{
+  "name": "file-counter",
+  "description": "Count files in the current directory grouped by file extension"
+}

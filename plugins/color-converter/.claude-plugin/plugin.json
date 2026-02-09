@@ -1,0 +1,10 @@
+{
+  "name": "color-converter",
+  "version": "1.2.0",
+  "description": "Convert between hex, RGB, HSL, and named CSS color formats",
+  "author": {
+    "name": "Frontend Tools"
+  },
+  "keywords": ["color", "hex", "rgb", "hsl", "css"],
+  "license": "MIT"
+}

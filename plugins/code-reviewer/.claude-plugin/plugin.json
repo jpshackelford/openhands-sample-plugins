@@ -1,0 +1,14 @@
+{
+  "name": "code-reviewer",
+  "version": "1.3.0",
+  "description": "Automated code review with configurable rulesets and severity levels",
+  "author": {
+    "name": "Quality Engineering",
+    "email": "quality@example.com",
+    "url": "https://github.com/quality-eng"
+  },
+  "homepage": "https://github.com/quality-eng/code-reviewer",
+  "repository": "https://github.com/quality-eng/code-reviewer",
+  "license": "MIT",
+  "keywords": ["code-review", "quality", "linting", "best-practices", "security"]
+}

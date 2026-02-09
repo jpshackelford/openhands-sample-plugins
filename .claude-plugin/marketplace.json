@@ -17,6 +17,206 @@
       },
       "category": "utilities",
       "tags": ["weather", "time", "forecast", "utilities"]
+    },
+    {
+      "name": "echo-test",
+      "source": "./plugins/echo-test"
+    },
+    {
+      "name": "noop",
+      "source": "./plugins/noop",
+      "description": "An empty skeleton plugin with no commands or skills"
+    },
+    {
+      "name": "hello-world",
+      "source": "./plugins/hello-world",
+      "tags": ["greeting", "demo"]
+    },
+    {
+      "name": "file-counter",
+      "source": "./plugins/file-counter",
+      "category": "utilities"
+    },
+    {
+      "name": "lorem-ipsum",
+      "source": "./plugins/lorem-ipsum",
+      "description": "Generate placeholder lorem ipsum text in various formats and lengths",
+      "version": "0.1.0",
+      "category": "text"
+    },
+    {
+      "name": "git-summary",
+      "source": "./plugins/git-summary",
+      "version": "0.2.0",
+      "category": "developer-tools",
+      "tags": ["git", "summary"]
+    },
+    {
+      "name": "json-formatter",
+      "source": "./plugins/json-formatter",
+      "description": "Pretty-print and validate JSON data with syntax highlighting",
+      "version": "1.0.0",
+      "author": {
+        "name": "DevTools Contributors"
+      },
+      "category": "developer-tools",
+      "tags": ["json", "formatting", "validation"]
+    },
+    {
+      "name": "uuid-generator",
+      "source": "./plugins/uuid-generator",
+      "description": "Generate UUIDs in v4 and v7 formats",
+      "version": "1.1.0",
+      "author": {
+        "name": "Utility Plugins Team",
+        "email": "plugins@example.com"
+      },
+      "category": "utilities",
+      "tags": ["uuid", "generator"]
+    },
+    {
+      "name": "base64-tools",
+      "source": "./plugins/base64-tools",
+      "description": "Encode and decode Base64 strings with support for URL-safe variants",
+      "version": "1.0.0",
+      "author": {
+        "name": "Encoding Utils Team"
+      },
+      "category": "utilities",
+      "tags": ["base64", "encode", "decode", "encoding"],
+      "keywords": ["base64", "encode", "decode"]
+    },
+    {
+      "name": "timestamp-converter",
+      "source": "./plugins/timestamp-converter",
+      "version": "0.3.0",
+      "category": "utilities"
+    },
+    {
+      "name": "color-converter",
+      "source": "./plugins/color-converter",
+      "description": "Convert between hex, RGB, HSL, and named CSS color formats",
+      "version": "1.2.0",
+      "author": {
+        "name": "Frontend Tools"
+      },
+      "license": "MIT",
+      "category": "frontend",
+      "tags": ["color", "hex", "rgb", "hsl", "css"]
+    },
+    {
+      "name": "regex-tester",
+      "source": "./plugins/regex-tester",
+      "description": "Test and explain regular expressions against sample input strings",
+      "category": "developer-tools",
+      "tags": ["regex", "pattern", "testing"]
+    },
+    {
+      "name": "markdown-toc",
+      "source": "./plugins/markdown-toc",
+      "description": "Generate a table of contents for Markdown files based on headings",
+      "version": "2.0.0",
+      "author": {
+        "name": "Doc Tools Team",
+        "email": "docs@example.com"
+      },
+      "homepage": "https://github.com/doc-tools/markdown-toc",
+      "repository": "https://github.com/doc-tools/markdown-toc",
+      "license": "MIT",
+      "category": "documentation",
+      "tags": ["markdown", "toc", "documentation"]
+    },
+    {
+      "name": "port-checker",
+      "source": "./plugins/port-checker",
+      "description": "Check whether TCP ports are open or closed on a given host",
+      "version": "1.0.0",
+      "author": {
+        "name": "NetOps Team"
+      },
+      "license": "BSD-3-Clause",
+      "category": "networking",
+      "tags": ["network", "port", "tcp", "diagnostics"]
+    },
+    {
+      "name": "code-reviewer",
+      "source": "./plugins/code-reviewer",
+      "description": "Automated code review with configurable rulesets and severity levels",
+      "version": "1.3.0",
+      "author": {
+        "name": "Quality Engineering",
+        "email": "quality@example.com"
+      },
+      "homepage": "https://github.com/quality-eng/code-reviewer",
+      "license": "MIT",
+      "category": "code-quality",
+      "tags": ["code-review", "quality", "linting", "security"]
+    },
+    {
+      "name": "docker-helper",
+      "source": "./plugins/docker-helper",
+      "description": "Manage Docker containers, images, and compose stacks from natural language",
+      "version": "0.9.0",
+      "author": {
+        "name": "Container Tools",
+        "email": "containers@example.dev"
+      },
+      "license": "MIT",
+      "category": "devops",
+      "tags": ["docker", "containers", "compose", "devops"]
+    },
+    {
+      "name": "api-tester",
+      "source": "./plugins/api-tester",
+      "description": "Send HTTP requests and validate API responses with assertions",
+      "version": "1.0.0",
+      "category": "developer-tools",
+      "tags": ["api", "http", "rest", "testing", "curl"]
+    },
+    {
+      "name": "project-init",
+      "source": "./plugins/project-init",
+      "description": "Scaffold new projects from templates with configurable options",
+      "version": "2.0.0",
+      "author": {
+        "name": "Scaffolding Team",
+        "email": "scaffold@example.com"
+      },
+      "homepage": "https://github.com/scaffolding/project-init",
+      "repository": "https://github.com/scaffolding/project-init",
+      "license": "MIT",
+      "category": "scaffolding",
+      "tags": ["scaffold", "template", "project", "init", "boilerplate"]
+    },
+    {
+      "name": "security-scanner",
+      "source": "./plugins/security-scanner",
+      "description": "Scan code for common security vulnerabilities and OWASP top 10 issues",
+      "version": "0.8.0",
+      "author": {
+        "name": "AppSec Team",
+        "email": "appsec@example.com"
+      },
+      "homepage": "https://github.com/appsec/security-scanner",
+      "repository": "https://github.com/appsec/security-scanner",
+      "license": "Apache-2.0",
+      "category": "security",
+      "tags": ["security", "vulnerability", "owasp", "scanning", "sast"]
+    },
+    {
+      "name": "team-standup",
+      "source": "./plugins/team-standup",
+      "description": "Generate daily standup summaries from git activity and issue trackers",
+      "version": "1.5.0",
+      "author": {
+        "name": "Agile Tools",
+        "email": "agile@example.com"
+      },
+      "homepage": "https://github.com/agile-tools/team-standup",
+      "repository": "https://github.com/agile-tools/team-standup",
+      "license": "MIT",
+      "category": "productivity",
+      "tags": ["standup", "agile", "scrum", "team", "daily"]
     }
   ]
 }

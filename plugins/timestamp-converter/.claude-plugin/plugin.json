@@ -1,0 +1,10 @@
+{
+  "name": "timestamp-converter",
+  "version": "0.3.0",
+  "description": "Convert between Unix timestamps and human-readable date formats",
+  "author": {
+    "name": "Time Utils",
+    "email": "time-utils@example.dev"
+  },
+  "keywords": ["timestamp", "unix", "date", "time", "conversion"]
+}

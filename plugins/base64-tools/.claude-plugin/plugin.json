@@ -1,0 +1,9 @@
+{
+  "name": "base64-tools",
+  "version": "1.0.0",
+  "description": "Encode and decode Base64 strings with support for URL-safe variants",
+  "author": {
+    "name": "Encoding Utils Team"
+  },
+  "keywords": ["base64", "encode", "decode", "encoding", "utilities"]
+}
