@@ -5,5 +5,32 @@
   "author": {
     "name": "Utility Plugins Team",
     "email": "plugins@example.com"
-  }
+  },
+  "message": "Generate one or more UUIDs",
+  "parameters": {
+    "count": {
+      "type": "number",
+      "description": "Number of UUIDs to generate",
+      "required": false,
+      "default": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "UUID version to generate (v4 or v7)",
+      "required": false,
+      "default": "v4"
+    }
+  },
+  "examples": [
+    {
+      "title": "Single UUID",
+      "prompt": "Generate a UUID",
+      "parameters": { "count": 1, "version": "v4" }
+    },
+    {
+      "title": "Multiple v7 UUIDs",
+      "prompt": "Generate 5 v7 UUIDs",
+      "parameters": { "count": 5, "version": "v7" }
+    }
+  ]
 }

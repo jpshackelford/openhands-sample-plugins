@@ -6,5 +6,25 @@
     "name": "Time Utils",
     "email": "time-utils@example.dev"
   },
-  "keywords": ["timestamp", "unix", "date", "time", "conversion"]
+  "keywords": ["timestamp", "unix", "date", "time", "conversion"],
+  "message": "Convert between Unix timestamps and human-readable dates",
+  "parameters": {
+    "input": {
+      "type": "string",
+      "description": "A Unix timestamp (e.g. 1700000000) or date string (e.g. 2024-01-15T10:30:00Z)",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "Unix to date",
+      "prompt": "Convert timestamp 1700000000 to a human-readable date",
+      "parameters": { "input": "1700000000" }
+    },
+    {
+      "title": "Date to Unix",
+      "prompt": "Convert 2024-01-15T10:30:00Z to a Unix timestamp",
+      "parameters": { "input": "2024-01-15T10:30:00Z" }
+    }
+  ]
 }

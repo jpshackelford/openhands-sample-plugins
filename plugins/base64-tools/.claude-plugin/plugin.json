@@ -5,5 +5,31 @@
   "author": {
     "name": "Encoding Utils Team"
   },
-  "keywords": ["base64", "encode", "decode", "encoding", "utilities"]
+  "keywords": ["base64", "encode", "decode", "encoding", "utilities"],
+  "message": "Encode or decode a Base64 string",
+  "parameters": {
+    "text": {
+      "type": "string",
+      "description": "Text to encode, or Base64 string to decode",
+      "required": true
+    },
+    "action": {
+      "type": "string",
+      "description": "Whether to encode or decode (encode or decode)",
+      "required": false,
+      "default": "encode"
+    }
+  },
+  "examples": [
+    {
+      "title": "Encode text",
+      "prompt": "Encode 'Hello World' to Base64",
+      "parameters": { "text": "Hello World", "action": "encode" }
+    },
+    {
+      "title": "Decode Base64",
+      "prompt": "Decode SGVsbG8gV29ybGQ= from Base64",
+      "parameters": { "text": "SGVsbG8gV29ybGQ=", "action": "decode" }
+    }
+  ]
 }

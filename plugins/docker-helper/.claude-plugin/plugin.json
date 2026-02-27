@@ -9,5 +9,30 @@
   "homepage": "https://github.com/container-tools/docker-helper",
   "repository": "https://github.com/container-tools/docker-helper",
   "license": "MIT",
-  "keywords": ["docker", "containers", "compose", "devops", "infrastructure"]
+  "keywords": ["docker", "containers", "compose", "devops", "infrastructure"],
+  "message": "Show Docker container status or tail container logs",
+  "parameters": {
+    "container": {
+      "type": "string",
+      "description": "Container name for log viewing",
+      "required": false
+    },
+    "lines": {
+      "type": "number",
+      "description": "Number of log lines to show",
+      "required": false,
+      "default": 50
+    }
+  },
+  "examples": [
+    {
+      "title": "Container status",
+      "prompt": "Show the status of all running Docker containers"
+    },
+    {
+      "title": "View logs",
+      "prompt": "Show the last 100 lines of logs from the my-app container",
+      "parameters": { "container": "my-app", "lines": 100 }
+    }
+  ]
 }

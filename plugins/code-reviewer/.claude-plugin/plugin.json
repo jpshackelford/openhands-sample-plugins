@@ -10,5 +10,25 @@
   "homepage": "https://github.com/quality-eng/code-reviewer",
   "repository": "https://github.com/quality-eng/code-reviewer",
   "license": "MIT",
-  "keywords": ["code-review", "quality", "linting", "best-practices", "security"]
+  "keywords": ["code-review", "quality", "linting", "best-practices", "security"],
+  "message": "Review code for bugs, security issues, and style improvements",
+  "parameters": {
+    "target": {
+      "type": "string",
+      "description": "File path, directory, or 'diff' to review staged git changes",
+      "required": false,
+      "default": "diff"
+    }
+  },
+  "examples": [
+    {
+      "title": "Review git diff",
+      "prompt": "Review my recent code changes for bugs and security issues"
+    },
+    {
+      "title": "Review a file",
+      "prompt": "Review src/auth.ts for security vulnerabilities",
+      "parameters": { "target": "src/auth.ts" }
+    }
+  ]
 }

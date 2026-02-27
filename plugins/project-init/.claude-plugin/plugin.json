@@ -10,5 +10,36 @@
   "homepage": "https://github.com/scaffolding/project-init",
   "repository": "https://github.com/scaffolding/project-init",
   "license": "MIT",
-  "keywords": ["scaffold", "template", "project", "init", "boilerplate", "starter"]
+  "keywords": ["scaffold", "template", "project", "init", "boilerplate", "starter"],
+  "message": "Scaffold a new project from a template",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "description": "Project name for the new scaffold",
+      "required": true
+    },
+    "template": {
+      "type": "string",
+      "description": "Project template to use (node, python, or react)",
+      "required": false,
+      "default": "node"
+    }
+  },
+  "examples": [
+    {
+      "title": "Node.js project",
+      "prompt": "Scaffold a new Node.js project called my-api",
+      "parameters": { "name": "my-api", "template": "node" }
+    },
+    {
+      "title": "Python project",
+      "prompt": "Create a new Python project called my-library",
+      "parameters": { "name": "my-library", "template": "python" }
+    },
+    {
+      "title": "React app",
+      "prompt": "Scaffold a React app called my-app using Vite",
+      "parameters": { "name": "my-app", "template": "react" }
+    }
+  ]
 }

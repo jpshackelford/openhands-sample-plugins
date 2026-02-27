@@ -4,5 +4,25 @@
   "description": "Pretty-print and validate JSON data with syntax highlighting",
   "author": {
     "name": "DevTools Contributors"
-  }
+  },
+  "message": "Pretty-print and validate a JSON string",
+  "parameters": {
+    "input": {
+      "type": "string",
+      "description": "JSON string or file path to format",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "Format inline JSON",
+      "prompt": "Format this JSON: {\"name\":\"test\",\"value\":123,\"nested\":{\"a\":1}}",
+      "parameters": { "input": "{\"name\":\"test\",\"value\":123,\"nested\":{\"a\":1}}" }
+    },
+    {
+      "title": "Validate JSON file",
+      "prompt": "Pretty-print and validate package.json",
+      "parameters": { "input": "package.json" }
+    }
+  ]
 }
