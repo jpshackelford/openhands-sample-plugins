@@ -1,0 +1,33 @@
+{
+  "name": "port-checker",
+  "version": "1.0.0",
+  "description": "Check whether TCP ports are open or closed on a given host",
+  "author": {
+    "name": "NetOps Team",
+    "email": "netops@example.com"
+  },
+  "homepage": "https://github.com/netops/port-checker",
+  "repository": "https://github.com/netops/port-checker",
+  "license": "BSD-3-Clause",
+  "keywords": ["network", "port", "tcp", "connectivity", "diagnostics"],
+  "message": "Check if TCP ports are open on a host",
+  "parameters": {
+    "host": {
+      "type": "string",
+      "description": "Hostname or IP address to check",
+      "required": true
+    },
+    "ports": {
+      "type": "string",
+      "description": "Space-separated list of port numbers to check",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "Check common ports",
+      "prompt": "Check if ports 80, 443, and 8080 are open on localhost",
+      "parameters": { "host": "localhost", "ports": "80 443 8080" }
+    }
+  ]
+}

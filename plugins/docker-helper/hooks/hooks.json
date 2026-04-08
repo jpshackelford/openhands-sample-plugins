@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[docker-helper] Command executed at '$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+        ]
+      }
+    ]
+  }
+}

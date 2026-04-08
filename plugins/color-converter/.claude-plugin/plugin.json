@@ -1,0 +1,30 @@
+{
+  "name": "color-converter",
+  "version": "1.2.0",
+  "description": "Convert between hex, RGB, HSL, and named CSS color formats",
+  "author": {
+    "name": "Frontend Tools"
+  },
+  "keywords": ["color", "hex", "rgb", "hsl", "css"],
+  "license": "MIT",
+  "message": "Convert a color between hex, RGB, and HSL formats",
+  "parameters": {
+    "color": {
+      "type": "string",
+      "description": "Color value in hex (#FF5733), RGB (rgb(255,87,51)), HSL (hsl(11,100%,60%)), or CSS name (coral)",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "Hex to all formats",
+      "prompt": "Convert #FF5733 to RGB and HSL",
+      "parameters": { "color": "#FF5733" }
+    },
+    {
+      "title": "CSS name lookup",
+      "prompt": "What are the hex and RGB values for 'coral'?",
+      "parameters": { "color": "coral" }
+    }
+  ]
+}

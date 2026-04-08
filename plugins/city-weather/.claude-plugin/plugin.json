@@ -9,5 +9,25 @@
   "homepage": "https://github.com/jpshackelford/openhands-sample-plugins",
   "repository": "https://github.com/jpshackelford/openhands-sample-plugins",
   "license": "MIT",
-  "keywords": ["weather", "time", "forecast", "temperature", "precipitation"]
+  "keywords": ["weather", "time", "forecast", "temperature", "precipitation"],
+  "message": "Check the current weather for a city",
+  "parameters": {
+    "city": {
+      "type": "string",
+      "description": "City name to look up",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "Tokyo weather",
+      "prompt": "What's the weather like in Tokyo right now?",
+      "parameters": { "city": "Tokyo" }
+    },
+    {
+      "title": "London forecast",
+      "prompt": "Show me the precipitation forecast for London",
+      "parameters": { "city": "London" }
+    }
+  ]
 }

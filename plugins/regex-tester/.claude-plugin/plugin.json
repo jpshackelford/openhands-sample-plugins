@@ -1,0 +1,36 @@
+{
+  "name": "regex-tester",
+  "version": "0.5.0",
+  "description": "Test and explain regular expressions against sample input strings",
+  "author": {
+    "name": "Regex Wizards",
+    "email": "regex@example.dev"
+  },
+  "keywords": ["regex", "regular-expression", "pattern", "testing"],
+  "license": "Apache-2.0",
+  "message": "Test a regular expression against sample text",
+  "parameters": {
+    "pattern": {
+      "type": "string",
+      "description": "The regular expression pattern to test",
+      "required": true
+    },
+    "text": {
+      "type": "string",
+      "description": "The input text to match against",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "Phone number pattern",
+      "prompt": "Test regex \\d{3}-\\d{4} against '555-1234 and 666-7890'",
+      "parameters": { "pattern": "\\d{3}-\\d{4}", "text": "555-1234 and 666-7890" }
+    },
+    {
+      "title": "Email pattern",
+      "prompt": "Test regex [\\w.]+@[\\w]+\\.[a-z]{2,} against 'contact user@example.com for info'",
+      "parameters": { "pattern": "[\\w.]+@[\\w]+\\.[a-z]{2,}", "text": "contact user@example.com for info" }
+    }
+  ]
+}

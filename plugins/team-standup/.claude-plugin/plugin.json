@@ -1,0 +1,14 @@
+{
+  "name": "team-standup",
+  "version": "1.5.0",
+  "description": "Generate daily standup summaries from git activity and issue trackers",
+  "author": {
+    "name": "Agile Tools",
+    "email": "agile@example.com",
+    "url": "https://github.com/agile-tools"
+  },
+  "homepage": "https://github.com/agile-tools/team-standup",
+  "repository": "https://github.com/agile-tools/team-standup",
+  "license": "MIT",
+  "keywords": ["standup", "agile", "scrum", "team", "daily", "summary", "productivity"]
+}

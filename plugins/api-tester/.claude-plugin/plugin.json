@@ -1,0 +1,43 @@
+{
+  "name": "api-tester",
+  "version": "1.0.0",
+  "description": "Send HTTP requests and validate API responses with assertions",
+  "author": {
+    "name": "API Tools"
+  },
+  "homepage": "https://github.com/api-tools/api-tester",
+  "repository": "https://github.com/api-tools/api-tester",
+  "license": "MIT",
+  "keywords": ["api", "http", "rest", "testing", "curl"],
+  "message": "Send an HTTP request to an API endpoint",
+  "parameters": {
+    "method": {
+      "type": "string",
+      "description": "HTTP method (GET, POST, PUT, DELETE, PATCH)",
+      "required": true,
+      "default": "GET"
+    },
+    "url": {
+      "type": "string",
+      "description": "The API endpoint URL",
+      "required": true
+    },
+    "body": {
+      "type": "string",
+      "description": "JSON request body for POST/PUT/PATCH requests",
+      "required": false
+    }
+  },
+  "examples": [
+    {
+      "title": "GET request",
+      "prompt": "GET https://jsonplaceholder.typicode.com/posts/1",
+      "parameters": { "method": "GET", "url": "https://jsonplaceholder.typicode.com/posts/1" }
+    },
+    {
+      "title": "POST request",
+      "prompt": "POST https://jsonplaceholder.typicode.com/posts with body {\"title\": \"Test\", \"body\": \"Hello\", \"userId\": 1}",
+      "parameters": { "method": "POST", "url": "https://jsonplaceholder.typicode.com/posts", "body": "{\"title\": \"Test\", \"body\": \"Hello\", \"userId\": 1}" }
+    }
+  ]
+}

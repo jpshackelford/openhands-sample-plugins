@@ -1,0 +1,5 @@
+{
+  "name": "git-summary",
+  "version": "0.2.0",
+  "description": "Summarize recent git activity including commits, branches, and contributors"
+}

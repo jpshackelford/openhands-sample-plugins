@@ -1,0 +1,29 @@
+{
+  "name": "markdown-toc",
+  "version": "2.0.0",
+  "description": "Generate a table of contents for Markdown files based on headings",
+  "author": {
+    "name": "Doc Tools Team",
+    "email": "docs@example.com",
+    "url": "https://github.com/doc-tools"
+  },
+  "homepage": "https://github.com/doc-tools/markdown-toc",
+  "repository": "https://github.com/doc-tools/markdown-toc",
+  "license": "MIT",
+  "keywords": ["markdown", "toc", "table-of-contents", "documentation", "headings"],
+  "message": "Generate a table of contents for a Markdown file",
+  "parameters": {
+    "file": {
+      "type": "string",
+      "description": "Path to the Markdown file",
+      "required": true
+    }
+  },
+  "examples": [
+    {
+      "title": "README TOC",
+      "prompt": "Generate a table of contents for README.md",
+      "parameters": { "file": "README.md" }
+    }
+  ]
+}
