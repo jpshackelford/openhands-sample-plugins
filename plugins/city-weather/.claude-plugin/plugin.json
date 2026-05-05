@@ -18,7 +18,7 @@
       "default": "New York"
     }
   },
-  "message": "/city-weather:now ${city}",
+  "entry_command": "now",
   "examples": [
     {
       "title": "Tokyo Weather",
