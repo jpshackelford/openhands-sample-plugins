@@ -9,5 +9,31 @@
   "homepage": "https://github.com/jpshackelford/openhands-sample-plugins",
   "repository": "https://github.com/jpshackelford/openhands-sample-plugins",
   "license": "MIT",
-  "keywords": ["weather", "time", "forecast", "temperature", "precipitation"]
+  "keywords": ["weather", "time", "forecast", "temperature", "precipitation"],
+  "parameters": {
+    "city": {
+      "type": "string",
+      "description": "City name to get weather for (e.g., Tokyo, New York, London)",
+      "required": true,
+      "default": "New York"
+    }
+  },
+  "message": "/city-weather:now ${city}",
+  "examples": [
+    {
+      "title": "Tokyo Weather",
+      "prompt": "/city-weather:now Tokyo",
+      "parameters": { "city": "Tokyo" }
+    },
+    {
+      "title": "New York Weather",
+      "prompt": "/city-weather:now New York",
+      "parameters": { "city": "New York" }
+    },
+    {
+      "title": "London Weather",
+      "prompt": "/city-weather:now London",
+      "parameters": { "city": "London" }
+    }
+  ]
 }
